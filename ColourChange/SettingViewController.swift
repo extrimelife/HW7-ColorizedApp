@@ -35,7 +35,6 @@ class SettingViewController: UIViewController {
     var delegate: SettingViewControllerDelegate!
     
     var colorValue: UIColor!
-
     
     //MARK: - Override functions
     override func viewDidLoad() {
@@ -48,9 +47,11 @@ class SettingViewController: UIViewController {
         setupTextField()
         hideKeyboardTappedAround()
         colorWindow.backgroundColor = colorValue
-        
+        setValue(for: redSlider, greenSlider, blueSlider)
+        setValue(for: redRangeLabel, greenRangeLabel, blueRangeLabel)
+        setValue(for: redTextField, greenTextField, blueTextField)
     }
-
+    
     
     //MARK: - @IBAction Functions
     @IBAction func redSliderAction() {
@@ -136,8 +137,54 @@ class SettingViewController: UIViewController {
         textFields.forEach { textField in
             textField?.delegate = self
             textField?.inputAccessoryView = toolBar
+            textField?.placeholder = "1.00"
             textField?.keyboardType = .decimalPad
         }
+    }
+    
+    private func setValue(for colorSliders: UISlider...) {
+        let ciColor = CIColor(color: colorValue)
+        colorSliders.forEach { slider in
+            switch slider {
+            case redSlider:
+                redSlider.value = Float(ciColor.red)
+            case greenSlider:
+                greenSlider.value = Float(ciColor.green)
+            default:
+                blueSlider.value = Float(ciColor.blue)
+            }
+        }
+    }
+    
+    private func setValue(for rangeLabels: UILabel...) {
+        rangeLabels.forEach { label in
+            switch label {
+            case redRangeLabel:
+                redRangeLabel.text = string(from: redSlider)
+            case greenRangeLabel:
+                greenRangeLabel.text = string(from: greenSlider)
+            default:
+                blueRangeLabel.text = string(from: blueSlider)
+            }
+        }
+    }
+    
+    private func setValue(for textFields: UITextField...) {
+        textFields.forEach { textField in
+            switch textField {
+            case redTextField:
+                redTextField.text = string(from: redSlider)
+            case greenTextField:
+                greenTextField.text = string(from: greenSlider)
+            default:
+                blueTextField.text = string(from: blueSlider)
+            }
+        }
+    }
+    
+    // Метод нужен для форматирования свойств в строковое значение
+    private func string(from slider: UISlider) -> String {
+        String(format: "%.2f", slider.value)
     }
 }
 
@@ -175,16 +222,14 @@ extension SettingViewController: UITextFieldDelegate {
         case redTextField:
             redSlider.value = newValueTF
             redRangeLabel.text = redTextField.text
-            setupColour()
         case greenTextField:
             greenSlider.value = newValueTF
             greenRangeLabel.text = greenTextField.text
-            setupColour()
         default:
             blueSlider.value = newValueTF
             blueRangeLabel.text = blueTextField.text
-            setupColour()
         }
+        setupColour()
     }
 }
 
